@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>After the Code</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a terminal session. Rain-lit hero, then a stack of "programs" (panels), each one diagram. Single dark theme by choice. */
+:root {
+  --void: #020803;
+  --panel: #06120a;
+  --line: #12351d;
+  --glow: #7dff9b;      /* light green: primary accent */
+  --phosphor: #b8ffc8;  /* headings, bright text */
+  --text: #9fd8ac;      /* body text */
+  --dim: #4f8a5e;       /* captions */
+  --amber: #ffc857;     /* caught / blocked (semantic) */
+  --font-display: "Share Tech Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-body: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--void);
+}
+/* scanlines */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  background: repeating-linear-gradient(to bottom, rgba(125,255,155,0.025) 0 1px, transparent 1px 3px);
+}
+.wrap {
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; color: var(--phosphor); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.1rem, 6vw, 3.6rem); line-height: 1.05; text-shadow: 0 0 18px rgba(125,255,155,0.45); }
+h2 { font-size: clamp(1.4rem, 3.2vw, 1.9rem); line-height: 1.2; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; max-width: 65ch; }
+.prompt { font-family: var(--font-display); color: var(--glow); letter-spacing: 0.08em; font-size: 0.85rem; text-transform: uppercase; }
+.prompt::before { content: "> "; color: var(--dim); }
+.caption { color: var(--dim); font-size: 0.8rem; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+#rain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0.55; }
+.hero-inner {
+  position: relative; max-width: 980px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 72px 56px;
+  display: grid; gap: 18px;
+  background: radial-gradient(ellipse at 20% 60%, rgba(2,8,3,0.92) 0%, rgba(2,8,3,0.55) 55%, transparent 80%);
+}
+.cursor { display: inline-block; width: 0.55em; height: 0.9em; background: var(--glow); vertical-align: -0.05em; margin-left: 6px; animation: blink 1.1s steps(1) infinite; box-shadow: 0 0 10px var(--glow); }
+@keyframes blink { 50% { opacity: 0; } }
+.hero p { font-size: 1.05rem; color: var(--text); }
+.hero p strong { color: var(--phosphor); font-weight: 500; }
+
+/* Panels */
+main { display: grid; gap: 28px; margin-top: 36px; }
+.panel {
+  background: var(--panel); border: 1px solid var(--line);
+  padding: 28px clamp(16px, 3vw, 32px);
+  display: grid; gap: 18px; min-width: 0;
+}
+.panel-head { display: grid; gap: 8px; }
+
+/* Time shift */
+.toggle { display: flex; gap: 8px; flex-wrap: wrap; }
+.toggle button {
+  font: inherit; font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.05em;
+  background: transparent; color: var(--dim); border: 1px solid var(--line);
+  padding: 8px 14px; cursor: pointer;
+}
+.toggle button[aria-pressed="true"] { color: var(--void); background: var(--glow); border-color: var(--glow); box-shadow: 0 0 14px rgba(125,255,155,0.4); }
+.toggle button:hover { border-color: var(--glow); color: var(--phosphor); }
+.toggle button[aria-pressed="true"]:hover { color: var(--void); }
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: minmax(130px, 210px) 1fr 3.2em; gap: 12px; align-items: center; }
+.bar-row .label { font-size: 0.88rem; color: var(--text); }
+.bar-row.up .label { color: var(--phosphor); }
+.track { height: 16px; background: rgba(125,255,155,0.05); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.fill {
+  height: 100%; width: 0; background: linear-gradient(90deg, rgba(125,255,155,0.35), var(--glow));
+  box-shadow: 0 0 12px rgba(125,255,155,0.5);
+  transition: width 0.9s cubic-bezier(.7,0,.2,1);
+}
+.pct { font-family: var(--font-display); font-variant-numeric: tabular-nums; color: var(--phosphor); text-align: right; }
+.shift-note { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.shift-note div { border-left: 2px solid var(--glow); padding-left: 12px; font-size: 0.9rem; }
+.shift-note b { color: var(--phosphor); font-weight: 500; display: block; font-family: var(--font-display); font-size: 1rem; }
+
+/* Value spectrum */
+.spectrum-box { padding-top: 6px; }
+.spec-track { position: relative; height: 6px; background: linear-gradient(90deg, rgba(125,255,155,0.15), var(--glow)); }
+.spec-track::before, .spec-track::after { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--dim); position: absolute; top: -22px; }
+.spec-track::before { content: "SPEED MATTERS MOST"; left: 0; }
+.spec-track::after { content: "STABILITY MATTERS MOST"; right: 0; }
+.spec-pulse { position: absolute; right: 0; top: 50%; width: 18px; height: 18px; margin: -9px -9px 0 0; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 0 rgba(125,255,155,0.6); animation: pulse 1.8s ease-out infinite; }
+@keyframes pulse { to { box-shadow: 0 0 0 16px rgba(125,255,155,0); } }
+.spec-points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.spec-pt { display: grid; gap: 4px; align-content: start; font-size: 0.85rem; min-width: 0; }
+.spec-pt:nth-child(2) { text-align: center; }
+.spec-pt:nth-child(3) { text-align: right; }
+.spec-pt b { color: var(--text); font-weight: 500; }
+.spec-pt span { color: var(--dim); }
+.spec-pt.us b { color: var(--phosphor); }
+
+.vs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.vs > div { border: 1px dashed var(--line); padding: 16px; display: grid; gap: 8px; align-content: start; }
+.vs > div:first-child { color: var(--dim); }
+.vs > div:first-child h3 { color: var(--text); }
+.vs > div:first-child li::before { content: "✕ "; color: var(--amber); }
+.tag-go { color: var(--glow); }
+.vs .pick { border: 1px solid var(--glow); box-shadow: 0 0 18px rgba(125,255,155,0.12); }
+.vs ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 0.9rem; }
+.vs li::before { content: "› "; color: var(--glow); }
+
+/* Gate flow */
+.flow-box { overflow-x: auto; }
+#flow { width: 100%; min-width: 620px; height: auto; display: block; }
+#flow text { font-family: var(--font-display); }
+.stats { display: flex; gap: 28px; flex-wrap: wrap; font-family: var(--font-display); }
+.stats span { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.stats .ok span { color: var(--glow); }
+.stats .caught span { color: var(--amber); }
+.stats div { display: grid; }
+.stats small { color: var(--dim); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Ranked ideas */
+.ranks { display: grid; gap: 0; }
+.rank {
+  display: grid; grid-template-columns: 2.2em 1fr auto; gap: 14px; align-items: start;
+  padding: 16px 0; border-top: 1px dashed var(--line);
+}
+.rank:first-child { border-top: none; }
+.rank .n { font-family: var(--font-display); color: var(--glow); font-size: 1.4rem; line-height: 1.2; }
+.rank .body { display: grid; gap: 4px; min-width: 0; }
+.rank .body p { font-size: 0.9rem; }
+.meter { display: flex; gap: 3px; padding-top: 6px; }
+.meter i { width: 10px; height: 14px; border: 1px solid var(--line); background: transparent; }
+.meter i.on { background: var(--glow); border-color: var(--glow); box-shadow: 0 0 6px rgba(125,255,155,0.6); }
+.tag { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+
+/* Additions */
+.adds { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.add { border: 1px solid var(--line); padding: 16px; display: grid; gap: 6px; align-content: start; transition: border-color .2s, box-shadow .2s; }
+.add:hover { border-color: var(--glow); box-shadow: 0 0 16px rgba(125,255,155,0.15) inset; }
+.add p { font-size: 0.88rem; }
+
+/* Weekly split */
+.split { display: flex; height: 44px; border: 1px solid var(--line); position: relative; overflow: hidden; }
+.seg { display: flex; align-items: center; justify-content: center; font-family: var(--font-display); color: var(--void); font-size: 0.95rem; border-right: 2px solid var(--void); }
+.seg:last-child { border-right: none; }
+.split::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 60px; left: -60px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: sweep 4s linear infinite;
+}
+@keyframes sweep { to { left: 100%; } }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; }
+.legend div { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; font-size: 0.88rem; }
+.legend i { width: 14px; height: 14px; }
+.legend b { font-family: var(--font-display); font-weight: 400; color: var(--phosphor); font-variant-numeric: tabular-nums; }
+
+/* Close */
+.close { border: 1px solid var(--glow); box-shadow: 0 0 30px rgba(125,255,155,0.12); }
+.close h2 { color: var(--glow); }
+
+@media (max-width: 560px) {
+  .bar-row { grid-template-columns: 1fr 3em; }
+  .bar-row .label { grid-column: 1 / -1; }
+  .rank { grid-template-columns: 2em 1fr; }
+  .rank .meter { grid-column: 2; padding-top: 0; }
+  .seg { font-size: 0.75rem; }
+  .spec-points { grid-template-columns: 1fr; }
+  .spec-pt:nth-child(2), .spec-pt:nth-child(3) { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor, .split::after, .spec-pulse { animation: none; }
+  .fill { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <div class="prompt">session://developer/2026</div>
+    <h1>The code writes itself.<br>What do you do now?<span class="cursor" aria-hidden="true"></span></h1>
+    <p>AI agents now write most of the code. The hours they free up <strong>don't stay free</strong>. They move to specifying, checking and owning the work. The goal is <strong>more value and higher quality, not more output</strong>. This page maps where that time should go.</p>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <section class="panel" aria-labelledby="t-shift">
+    <div class="panel-head">
+      <div class="prompt">01 · time.reallocate()</div>
+      <h2 id="t-shift">Where a developer's week goes</h2>
+      <p>Typing code shrinks. Judgment work grows. The bottleneck moves from writing code to deciding and verifying.</p>
+    </div>
+    <div class="toggle" role="group" aria-label="Compare eras">
+      <button type="button" id="btn-before" aria-pressed="false">Before agents</button>
+      <button type="button" id="btn-after" aria-pressed="true">With agents</button>
+    </div>
+    <div class="bars" id="bars"></div>
+    <p class="caption">Illustrative split of a 40-hour week, not survey data. Auto-cycles until you pick one.</p>
+    <div class="shift-note">
+      <div><b>Specifying</b>A vague requirement used to cost an afternoon. Now it produces a fast, confident, wrong pull request.</div>
+      <div><b>Verifying</b>Reading code you didn't write is harder than writing it.</div>
+      <div><b>Owning</b>When production breaks, "the agent wrote it" is not an answer.</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-value">
+    <div class="panel-head">
+      <div class="prompt">02 · priority.set(value &gt; velocity)</div>
+      <h2 id="t-value">Deliver more value, not more changes</h2>
+      <p>Agents make it possible to ship more. That doesn't mean we should. How we spend the saved time depends on the kind of work. In healthcare, a fast release that breaks a clinical workflow costs far more than a slow one that works.</p>
+    </div>
+    <div class="spectrum-box">
+      <div class="spectrum" role="img" aria-label="Spectrum from work where speed matters most (prototypes, internal tools) to work where stability matters most (healthcare, finance, safety-critical systems).">
+        <div class="spec-track"><span class="spec-pulse" aria-hidden="true"></span></div>
+        <div class="spec-points">
+          <div class="spec-pt"><i></i><b>Prototypes, internal tools</b><span>Learn fast. Throwaway is fine.</span></div>
+          <div class="spec-pt"><i></i><b>Business apps</b><span>Balance speed with reliability.</span></div>
+          <div class="spec-pt us"><i></i><b>Healthcare, finance, safety-critical</b><span>Stability, safety and correctness first.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="vs">
+      <div>
+        <span class="tag">Not the goal</span>
+        <h3>Using saved time to ship more</h3>
+        <ul><li>More features per sprint</li><li>More releases per week</li><li>Faster ticket closure</li></ul>
+      </div>
+      <div class="pick">
+        <span class="tag tag-go">The goal</span>
+        <h3>Using saved time to ship better</h3>
+        <ul><li>Changes that clearly add value and are well understood</li><li>Fewer tickets: higher quality means fewer breaking changes, and fixing root causes stops the same bugs coming back</li><li>Deeper testing and edge cases</li><li>Security and compliance review</li><li>Paying down risky legacy code</li><li>Validating features with real users</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-gates">
+    <div class="panel-head">
+      <div class="prompt">03 · pipeline.guard()</div>
+      <h2 id="t-gates">Gates keep quality high as agents write more code</h2>
+      <p>Every change an agent makes has to pass through your guardrails. Work you put into the gates pays off on every future change, whether a person or an agent wrote it. The aim is stable releases, not more releases.</p>
+    </div>
+    <div class="flow-box">
+      <svg id="flow" viewBox="0 0 900 250" role="img" aria-label="Animated diagram: changes flow from the AI agent through five gates (tests, types, lint, security scan, architecture rules) to production. Some changes are caught at a gate.">
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <line x1="150" y1="125" x2="750" y2="125" stroke="#12351d" stroke-width="2" stroke-dasharray="4 6"/>
+        <rect x="10" y="80" width="140" height="90" fill="#06120a" stroke="#7dff9b" stroke-width="1.5"/>
+        <text x="80" y="118" fill="#b8ffc8" font-size="18" text-anchor="middle">AI AGENT</text>
+        <text x="80" y="142" fill="#4f8a5e" font-size="12" text-anchor="middle">writes changes</text>
+        <g id="gates"></g>
+        <rect x="750" y="80" width="140" height="90" fill="#06120a" stroke="#7dff9b" stroke-width="1.5"/>
+        <text x="820" y="118" fill="#b8ffc8" font-size="18" text-anchor="middle">PRODUCTION</text>
+        <text x="820" y="142" fill="#4f8a5e" font-size="12" text-anchor="middle">safe to ship</text>
+        <g id="packets"></g>
+      </svg>
+    </div>
+    <div class="stats" aria-live="off">
+      <div class="ok"><span id="c-ok">0</span><small>Shipped</small></div>
+      <div class="caught"><span id="c-caught">0</span><small>Caught by a gate</small></div>
+    </div>
+    <p class="caption">Simulation. Without gates, every amber packet would have reached production.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="t-rank">
+    <div class="panel-head">
+      <div class="prompt">04 · focus.sort(by: leverage)</div>
+      <h2 id="t-rank">Five core areas to invest in</h2>
+      <p>Ranked by long-term value. The higher an area sits, the more every future change benefits from it.</p>
+    </div>
+    <div class="ranks">
+      <div class="rank">
+        <div class="n">1</div>
+        <div class="body"><h3>Gates and codebase improvements</h3><p>Tests, linters, type checks, security scans and architecture rules in CI. An agent working inside strong guardrails can be trusted with much more.</p></div>
+        <div class="meter" aria-label="Leverage 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      </div>
+      <div class="rank">
+        <div class="n">2</div>
+        <div class="body"><h3>Secure coding</h3><p>Agents repeat insecure patterns confidently and at volume. Learn what to look for in review. This matters most in regulated domains such as healthcare.</p></div>
+        <div class="meter" aria-label="Leverage 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      </div>
+      <div class="rank">
+        <div class="n">3</div>
+        <div class="body"><h3>Communication</h3><p>Clear specs, explained trade-offs, pushing back on vague asks. A prompt is a spec for an agent, so this is now a core engineering skill.</p></div>
+        <div class="meter" aria-label="Leverage 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+      </div>
+      <div class="rank">
+        <div class="n">4</div>
+        <div class="body"><h3>Learning, deep rather than wide</h3><p>System design, data modeling, distributed systems and your business domain. This is how you spot when an agent's design is subtly wrong.</p></div>
+        <div class="meter" aria-label="Leverage 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+      </div>
+      <div class="rank">
+        <div class="n">5</div>
+        <div class="body"><span class="tag">Time-box it</span><h3>Keeping up with AI</h3><p>Tools change every month, so following all of it becomes a treadmill. An hour or two a week is enough. Learn the patterns that last: context, verification, decomposition.</p></div>
+        <div class="meter" aria-label="Leverage 2 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-add">
+    <div class="panel-head">
+      <div class="prompt">05 · focus.include(overlooked)</div>
+      <h2 id="t-add">Easy to overlook</h2>
+      <p>These rarely make it into a growth plan, but they matter just as much once agents do the typing.</p>
+    </div>
+    <div class="adds">
+      <div class="add"><h3>Get closer to users</h3><p>When code is cheap, the engineer who knows why a feature exists is worth more.</p></div>
+      <div class="add"><h3>Observability</h3><p>Know how the system really behaves in production, so stability and quality are measured, not assumed.</p></div>
+      <div class="add"><h3>Mentoring</h3><p>The old learning path of writing lots of code is getting shorter. Someone has to teach judgment.</p></div>
+      <div class="add"><h3>Rest</h3><p>Reviewing all day is draining. If every freed hour becomes more output, burnout comes sooner.</p></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-split">
+    <div class="panel-head">
+      <div class="prompt">06 · week.allocate()</div>
+      <h2 id="t-split">A suggested weekly split</h2>
+      <p>A starting point for the time agents free up, not a rule. Adjust it to your role.</p>
+    </div>
+    <div class="split" id="split" role="img" aria-label="Weekly split: guardrails 30%, deep learning 25%, communication 25%, AI tooling 10%, slack and rest 10%"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="panel close" aria-labelledby="t-close">
+    <div class="prompt">07 · team.discuss()</div>
+    <h2 id="t-close">Questions for your team</h2>
+    <div class="shift-note">
+      <div><b>Value</b>Which of your work needs speed, and which needs stability above all?</div>
+      <div><b>Gates</b>Which guardrail would catch the most agent mistakes if we added it this month?</div>
+      <div><b>Review</b>How do we review agent-written code well without spending the whole day doing it?</div>
+      <div><b>Measuring</b>What should "good work" mean once lines of code and closed tickets stop meaning much?</div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Matrix rain ---------- */
+  var cv = document.getElementById("rain"), cx = cv.getContext("2d");
+  var glyphs = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789{}<>=/;$#*+".split("");
+  var cols = [], fs = 16, w = 0, h = 0;
+  function size() {
+    var r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    w = r.width; h = r.height; cv.width = w * d; cv.height = h * d; cx.setTransform(d, 0, 0, d, 0, 0);
+    var n = Math.ceil(w / fs); cols = [];
+    for (var i = 0; i < n; i++) cols.push(Math.random() * h / fs);
+    cx.fillStyle = "#020803"; cx.fillRect(0, 0, w, h);
+  }
+  function drawRain() {
+    cx.fillStyle = "rgba(2,8,3,0.09)"; cx.fillRect(0, 0, w, h);
+    cx.font = fs + "px 'Share Tech Mono', monospace";
+    for (var i = 0; i < cols.length; i++) {
+      var y = cols[i] * fs, g = glyphs[(Math.random() * glyphs.length) | 0];
+      cx.fillStyle = Math.random() > 0.96 ? "#e8ffee" : "#7dff9b";
+      cx.fillText(g, i * fs, y);
+      if (y > h && Math.random() > 0.975) cols[i] = 0; else cols[i] += 1;
+    }
+  }
+  size(); window.addEventListener("resize", size);
+  if (reduce) { for (var k = 0; k < 40; k++) drawRain(); }
+  else { (function loop() { drawRain(); setTimeout(function () { requestAnimationFrame(loop); }, 55); })(); }
+
+  /* ---------- Time shift bars ---------- */
+  var rows = [
+    ["Writing code", 45, 10], ["Debugging", 20, 10], ["Specs & design", 10, 20],
+    ["Reviewing & verifying", 10, 25], ["Guardrails & gates", 0, 10],
+    ["Communication", 10, 15], ["Learning", 5, 10]
+  ];
+  var barsEl = document.getElementById("bars"), fills = [], pcts = [], rowEls = [];
+  rows.forEach(function (r) {
+    var row = document.createElement("div"); row.className = "bar-row";
+    row.innerHTML = '<div class="label">' + r[0] + '</div><div class="track"><div class="fill"></div></div><div class="pct">0%</div>';
+    barsEl.appendChild(row); rowEls.push(row);
+    fills.push(row.querySelector(".fill")); pcts.push(row.querySelector(".pct"));
+  });
+  var bBefore = document.getElementById("btn-before"), bAfter = document.getElementById("btn-after");
+  function show(after) {
+    rows.forEach(function (r, i) {
+      var v = after ? r[2] : r[1];
+      fills[i].style.width = (v / 45 * 100) + "%";
+      pcts[i].textContent = v + "%";
+      rowEls[i].classList.toggle("up", after && r[2] > r[1]);
+    });
+    bAfter.setAttribute("aria-pressed", after); bBefore.setAttribute("aria-pressed", !after);
+  }
+  var state = true, auto = null;
+  show(state);
+  function stopAuto() { if (auto) { clearInterval(auto); auto = null; } }
+  bBefore.addEventListener("click", function () { stopAuto(); state = false; show(false); });
+  bAfter.addEventListener("click", function () { stopAuto(); state = true; show(true); });
+  if (!reduce) auto = setInterval(function () { state = !state; show(state); }, 3800);
+
+  /* ---------- Gate flow ---------- */
+  var NS = "http://www.w3.org/2000/svg";
+  var gateNames = ["TESTS", "TYPES", "LINT", "SECURITY", "ARCH"];
+  var gateX = [250, 350, 450, 550, 650];
+  var gatesG = document.getElementById("gates"), gateRects = [];
+  gateNames.forEach(function (n, i) {
+    var r = document.createElementNS(NS, "rect");
+    r.setAttribute("x", gateX[i] - 6); r.setAttribute("y", 55); r.setAttribute("width", 12); r.setAttribute("height", 140);
+    r.setAttribute("fill", "#0b2614"); r.setAttribute("stroke", "#7dff9b"); r.setAttribute("stroke-width", "1");
+    gatesG.appendChild(r); gateRects.push(r);
+    var t = document.createElementNS(NS, "text");
+    t.setAttribute("x", gateX[i]); t.setAttribute("y", 222); t.setAttribute("fill", "#9fd8ac");
+    t.setAttribute("font-size", "13"); t.setAttribute("text-anchor", "middle"); t.textContent = n;
+    gatesG.appendChild(t);
+  });
+  var packG = document.getElementById("packets"), packets = [];
+  var okN = 0, caughtN = 0, okEl = document.getElementById("c-ok"), caEl = document.getElementById("c-caught");
+  function spawn() {
+    var c = document.createElementNS(NS, "circle");
+    c.setAttribute("r", 6); c.setAttribute("fill", "#7dff9b"); c.setAttribute("filter", "url(#glow)");
+    packG.appendChild(c);
+    var stopAt = Math.random() < 0.3 ? (Math.random() * 5) | 0 : -1;
+    packets.push({ el: c, x: 155, y: 125 + (Math.random() * 60 - 30), stopAt: stopAt, dead: 0, speed: 2.2 + Math.random() * 1.2 });
+  }
+  function flash(i) {
+    var r = gateRects[i]; r.setAttribute("fill", "#ffc857"); r.setAttribute("stroke", "#ffc857");
+    setTimeout(function () { r.setAttribute("fill", "#0b2614"); r.setAttribute("stroke", "#7dff9b"); }, 260);
+  }
+  var tick = 0;
+  function step() {
+    tick++;
+    if (tick % 22 === 0) spawn();
+    for (var i = packets.length - 1; i >= 0; i--) {
+      var p = packets[i];
+      if (p.dead) {
+        p.dead++; p.el.setAttribute("opacity", Math.max(0, 1 - p.dead / 30)); p.y += 1.2;
+        p.el.setAttribute("cy", p.y);
+        if (p.dead > 30) { p.el.remove(); packets.splice(i, 1); }
+        continue;
+      }
+      p.x += p.speed;
+      if (p.stopAt >= 0 && p.x >= gateX[p.stopAt] - 10) {
+        p.x = gateX[p.stopAt] - 10; p.dead = 1; p.el.setAttribute("fill", "#ffc857");
+        flash(p.stopAt); caughtN++; caEl.textContent = caughtN;
+      }
+      if (p.x >= 760) { p.el.remove(); packets.splice(i, 1); okN++; okEl.textContent = okN; continue; }
+      p.el.setAttribute("cx", p.x); p.el.setAttribute("cy", p.y);
+    }
+    requestAnimationFrame(step);
+  }
+  if (reduce) {
+    [[200, 105], [300, 140], [420, 115], [520, 135], [610, 110], [700, 128]].forEach(function (q, i) {
+      var c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", q[0]); c.setAttribute("cy", q[1]); c.setAttribute("r", 6);
+      c.setAttribute("fill", i === 2 ? "#ffc857" : "#7dff9b"); packG.appendChild(c);
+    });
+    okEl.textContent = "5"; caEl.textContent = "1";
+  } else {
+    for (var s = 0; s < 6; s++) { spawn(); packets[packets.length - 1].x = 155 + s * 95; if (packets[packets.length - 1].stopAt >= 0 && packets[packets.length - 1].x > gateX[packets[packets.length - 1].stopAt]) packets[packets.length - 1].stopAt = -1; }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- Weekly split ---------- */
+  var split = [
+    ["Guardrails, gates, codebase health", 30, "#7dff9b"],
+    ["Deep learning: design, security, domain", 25, "#5fd47c"],
+    ["Communication, specs, people", 25, "#3fa85f"],
+    ["AI tooling (time-boxed)", 10, "#b8ffc8"],
+    ["Slack and rest", 10, "#2a7a45"]
+  ];
+  var sp = document.getElementById("split"), lg = document.getElementById("legend");
+  split.forEach(function (s) {
+    var d = document.createElement("div"); d.className = "seg";
+    d.style.flex = s[1]; d.style.background = s[2]; d.textContent = s[1] + "%";
+    sp.appendChild(d);
+    var l = document.createElement("div");
+    l.innerHTML = '<i style="background:' + s[2] + '"></i><span>' + s[0] + '</span><b>' + s[1] + '%</b>';
+    lg.appendChild(l);
+  });
+})();
+</script>
+</body>
+</html>
