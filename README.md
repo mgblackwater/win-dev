@@ -19,7 +19,8 @@ drafts/<slug>/linkedin-post.md  LinkedIn post text and video plan
 1. Create `<slug>/index.html` for the page.
 2. Add drafts under `drafts/<slug>/`.
 3. Add an entry to the list in `index.html`.
-4. Commit and push. GitHub Pages updates within a minute or two.
+4. Add the GoatCounter script (see Analytics).
+5. Commit and push. GitHub Pages updates within a minute or two.
 
 ## Write-ups
 
@@ -27,3 +28,14 @@ drafts/<slug>/linkedin-post.md  LinkedIn post text and video plan
 |---|---|
 | 2026-11-20 | [The code writes itself. What do you do now?](after-the-code/) |
 | 2026-05 | [The Role Was Never the Code](the-role-was-never-the-code/) |
+
+## Analytics
+
+Page views are counted with [GoatCounter](https://win-dev.goatcounter.com) (no cookies, so no consent banner is needed).
+Every page loads this script in `<head>`, right after `nav.css`:
+
+```html
+<script data-goatcounter="https://win-dev.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+```
+
+Copy that line into any new page.
