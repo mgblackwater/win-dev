@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Role Was Never the Code</title>
+<meta name="description" content="Seventy years of software engineering: the tools changed completely, the role stayed the same.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an essay read in a terminal. One reading column, two diagrams set into the text. */
+:root {
+  --void: #020803;
+  --panel: #06120a;
+  --line: #12351d;
+  --glow: #7dff9b;
+  --phosphor: #b8ffc8;
+  --text: #9fd8ac;
+  --dim: #4f8a5e;
+  --amber: #ffc857;
+  --font-display: "Share Tech Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-body: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--void); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.75; }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(125,255,155,0.025) 0 1px, transparent 1px 3px); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 40px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+a { color: var(--glow); }
+.home { font-family: var(--font-display); font-size: 0.85rem; text-decoration: none; color: var(--dim); }
+.home:hover { color: var(--glow); }
+.prompt { font-family: var(--font-display); color: var(--glow); letter-spacing: 0.08em; font-size: 0.85rem; text-transform: uppercase; }
+.prompt::before { content: "> "; color: var(--dim); }
+h1 { font-family: var(--font-display); font-weight: 400; color: var(--phosphor); font-size: clamp(2.1rem, 6.5vw, 3.4rem); line-height: 1.05; margin: 4px 0 0; text-wrap: balance; text-shadow: 0 0 18px rgba(125,255,155,0.45); }
+.meta { color: var(--dim); font-size: 0.82rem; }
+h2 { font-family: var(--font-display); font-weight: 400; color: var(--phosphor); font-size: 1.35rem; line-height: 1.3; margin: 14px 0 0; text-wrap: balance; }
+p { margin: 0; max-width: 65ch; }
+strong { color: var(--phosphor); font-weight: 600; }
+.lead { font-size: 1.1rem; color: var(--phosphor); }
+
+/* Timeline */
+.figure { background: var(--panel); border: 1px solid var(--line); padding: 22px clamp(14px, 3vw, 26px); display: grid; gap: 14px; margin-block: 8px; }
+.timeline { display: grid; gap: 0; }
+.era { display: grid; grid-template-columns: 5.5em 1fr; gap: 14px; align-items: stretch; }
+.era .year { font-family: var(--font-display); color: var(--glow); padding-top: 10px; font-variant-numeric: tabular-nums; }
+.era .body { border-left: 1px solid var(--line); padding: 10px 0 10px 18px; position: relative; display: grid; gap: 2px; }
+.era .body::before { content: ""; position: absolute; left: -5px; top: 18px; width: 9px; height: 9px; background: var(--void); border: 1px solid var(--glow); }
+.era .tool { font-family: var(--font-display); color: var(--phosphor); font-size: 1.05rem; }
+.era .role { font-size: 0.85rem; color: var(--dim); }
+.era .role b { color: var(--glow); font-weight: 500; }
+.era.now .body::before { background: var(--glow); box-shadow: 0 0 10px var(--glow); }
+.era.lit .role b { text-shadow: 0 0 10px rgba(125,255,155,0.8); }
+.caption { color: var(--dim); font-size: 0.8rem; }
+
+/* Six duties */
+.duties { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.duties li { border: 1px solid var(--glow); padding: 12px 14px; font-size: 0.9rem; color: var(--phosphor); display: grid; gap: 4px; align-content: start; box-shadow: 0 0 12px rgba(125,255,155,0.08) inset; }
+.duties li small { font-family: var(--font-display); color: var(--dim); letter-spacing: 0.08em; font-size: 0.72rem; }
+.duties li.ai { border-style: dashed; border-color: var(--amber); color: var(--text); animation: fade 3.2s ease-in-out infinite; }
+.duties li.ai small { color: var(--amber); }
+@keyframes fade { 50% { opacity: 0.45; } }
+
+.closing { border-left: 2px solid var(--glow); padding-left: 16px; font-style: italic; color: var(--phosphor); }
+footer { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 18px; color: var(--dim); font-size: 0.82rem; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+@media (max-width: 480px) { .era { grid-template-columns: 4.2em 1fr; gap: 10px; } }
+@media (prefers-reduced-motion: reduce) { .duties li.ai { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="home" href="../">&larr; win-dev</a>
+  <div class="prompt">cat ./the-role-was-never-the-code</div>
+  <h1>The Role Was Never the Code</h1>
+  <div class="meta">By Win · First posted on LinkedIn, May 2026</div>
+
+  <p class="lead">Software engineering has always been the same job.</p>
+  <p>We learn a language, a framework, a stack — and use them to build something a person will use. The code was the medium. The user was the point.</p>
+
+  <div class="figure" aria-label="Timeline: from 1960s assembly to today's Gen AI, the role has been to deliver working software.">
+    <div class="timeline" id="timeline">
+      <div class="era"><div class="year">1960s</div><div class="body"><span class="tool">Assembly</span><span class="role">The role was to <b>deliver working software.</b></span></div></div>
+      <div class="era"><div class="year">1980s</div><div class="body"><span class="tool">C</span><span class="role">The role was to <b>deliver working software.</b></span></div></div>
+      <div class="era"><div class="year">1990s</div><div class="body"><span class="tool">Java and high-level OOP</span><span class="role">The role was to <b>deliver working software.</b></span></div></div>
+      <div class="era"><div class="year">2010s</div><div class="body"><span class="tool">Cloud services and packages</span><span class="role">The role was to <b>deliver working software.</b></span></div></div>
+      <div class="era now"><div class="year">Today</div><div class="body"><span class="tool">Gen AI</span><span class="role">We specify behavior, generate the implementation, review, refine, ship. The role is to <b>deliver working software.</b></span></div></div>
+    </div>
+  </div>
+
+  <h2>The role has been constant for seventy years. The tools have changed completely.</h2>
+
+  <p>What the role has always required:</p>
+  <div class="figure">
+    <ul class="duties">
+      <li><small>01</small>Understanding what is worth building</li>
+      <li><small>02</small>Specifying behavior precisely</li>
+      <li class="ai"><small>03 · BEING ABSTRACTED</small>Producing the implementation</li>
+      <li><small>04</small>Verifying that it works</li>
+      <li><small>05</small>Maintaining it as the world changes</li>
+      <li><small>06</small>Owning the outcome for the user</li>
+    </ul>
+    <p class="caption">One of six is shifting to Gen AI. The other five remain on the engineer.</p>
+  </div>
+
+  <p>Producing the implementation is one of six. It is the one being abstracted right now. The other five remain entirely on the engineer. That is where engineering judgment lives.</p>
+  <p>One more thing has been constant alongside the role: the obligation to learn.</p>
+  <p>Today, the investment has two halves, and both matter.</p>
+
+  <p><strong>The first is learning to use Gen AI effectively.</strong> Not autocomplete. Specifying behavior, structuring context, evaluating output, integrating generated code, maintaining quality at speed — these are real disciplines that reward serious practice.</p>
+
+  <p><strong>The second is continuing to invest in software engineering fundamentals.</strong> Data structures. System design. Debugging. Performance. Security. These matter more when AI writes the code, not less. You cannot specify what you do not understand. You cannot judge code you cannot read. You cannot maintain what you never learned.</p>
+
+  <p>Engineers who pull ahead invest in both. Fundamentals without Gen AI fluency leaves you slow. Gen AI fluency without fundamentals leaves you producing code you cannot judge or maintain.</p>
+
+  <p class="closing">Most of us got into this work because we wanted to build things — and watch someone use them. The code was a vehicle for that. Gen AI removes friction between us and the destination.</p>
+
+  <p>Seventy years from now, software engineering will mean what it has always meant: delivering software that works for the people who use it.</p>
+  <p>The tools will be unrecognizable. The role will be intact.</p>
+  <p>The engineers who hold the role will be the ones who keep learning — the new tools and the old fundamentals, side by side, again and again.</p>
+
+  <footer>
+    <a href="https://www.linkedin.com/feed/update/urn:li:activity:7460156997569544192/">Original post on LinkedIn</a>
+    <a href="../after-the-code/">Next: The code writes itself. What do you do now? &rarr;</a>
+  </footer>
+</div>
+<script>
+(function () {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var eras = document.querySelectorAll("#timeline .era"), i = 0;
+  setInterval(function () {
+    eras.forEach(function (e) { e.classList.remove("lit"); });
+    eras[i % eras.length].classList.add("lit"); i++;
+  }, 1200);
+})();
+</script>
+</body>
+</html>

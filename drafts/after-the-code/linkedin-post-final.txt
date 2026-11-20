@@ -1,0 +1,30 @@
+𝗦𝗵𝗶𝗽 𝗕𝗲𝘁𝘁𝗲𝗿, 𝗡𝗼𝘁 𝗠𝗼𝗿𝗲
+
+A few months ago I wrote that the role was never the code. The role is to deliver working software.
+
+Gen AI now writes a large share of the implementation. That frees up hours. The question is what we do with them.
+
+The easy answer is to ship more. More features per sprint. More releases per week. Faster ticket closure.
+
+In some work, that is fine. A prototype or an internal tool can move fast and learn fast.
+
+In healthcare, it is not. A fast release that breaks a clinical workflow costs far more than a slow one that works. Here, the time AI gives back should turn into value, stability and quality — not volume.
+
+𝗠𝗼𝗿𝗲 𝗼𝘂𝘁𝗽𝘂𝘁 𝗶𝘀 𝗻𝗼𝘁 𝘁𝗵𝗲 𝗴𝗼𝗮𝗹. 𝗕𝗲𝘁𝘁𝗲𝗿 𝗼𝘂𝘁𝗰𝗼𝗺𝗲𝘀 𝗮𝗿𝗲.
+
+Where I think the freed hours belong:
+ • Gates in the codebase — tests, type checks, security scans, architecture rules
+ • Secure coding, and knowing what to look for in review
+ • Specifying clearly, because a vague requirement now becomes a confident, wrong pull request
+ • Fundamentals — system design, data modeling, the domain we serve
+ • Keeping up with Gen AI, time-boxed, so it does not become a treadmill
+
+𝗚𝗮𝘁𝗲𝘀 𝗰𝗼𝗺𝗲 𝗳𝗶𝗿𝘀𝘁. Every change an agent makes has to pass through them. An hour spent on a gate pays off on every change after it, whether a person or an agent wrote it.
+
+The measure I care about is not how many tickets we close. It is how many never get opened — because quality went up and fewer things broke.
+
+𝙎𝙥𝙚𝙚𝙙 𝙬𝙖𝙨 𝙣𝙚𝙫𝙚𝙧 𝙩𝙝𝙚 𝙥𝙤𝙞𝙣𝙩. 𝙒𝙤𝙧𝙠𝙞𝙣𝙜 𝙨𝙤𝙛𝙩𝙬𝙖𝙧𝙚 𝙬𝙖𝙨. 𝙂𝙚𝙣 𝘼𝙄 𝙜𝙞𝙫𝙚𝙨 𝙪𝙨 𝙩𝙞𝙢𝙚 𝙗𝙖𝙘𝙠. 𝙃𝙤𝙬 𝙬𝙚 𝙨𝙥𝙚𝙣𝙙 𝙞𝙩 𝙙𝙚𝙘𝙞𝙙𝙚𝙨 𝙬𝙝𝙚𝙩𝙝𝙚𝙧 𝙤𝙪𝙧 𝙨𝙤𝙛𝙩𝙬𝙖𝙧𝙚 𝙜𝙚𝙩𝙨 𝙛𝙖𝙨𝙩𝙚𝙧, 𝙤𝙧 𝙜𝙚𝙩𝙨 𝙗𝙚𝙩𝙩𝙚𝙧.
+
+I put these ideas into an interactive page — link in the comments.
+
+#SoftwareEngineering #GenAI #HealthTech

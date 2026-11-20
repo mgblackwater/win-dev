@@ -24,3 +24,4 @@ drafts/<slug>/linkedin-post.md  LinkedIn post text and video plan
 | Date | Title |
 |---|---|
 | 2026-11-20 | [The code writes itself. What do you do now?](after-the-code/) |
+| 2026-05 | [The Role Was Never the Code](the-role-was-never-the-code/) |
