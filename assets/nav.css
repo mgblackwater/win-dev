@@ -1,0 +1,21 @@
+/* Shared site navigation for win-dev. Pages define their own colors; these fall back if missing. */
+.site-nav {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(2, 8, 3, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #12351d;
+}
+.site-nav .inner {
+  max-width: 980px; margin: 0 auto;
+  padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  font-family: "Share Tech Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+.site-nav a { color: #9fd8ac; text-decoration: none; letter-spacing: 0.06em; }
+.site-nav a:hover, .site-nav a:focus-visible { color: #7dff9b; outline: none; }
+.site-nav .brand { color: #b8ffc8; font-size: 1.1rem; }
+.site-nav .brand::before { content: "> "; color: #4f8a5e; }
+.site-nav .links { display: flex; gap: 22px; font-size: 0.9rem; text-transform: uppercase; }
+.site-nav .links a[aria-current="page"] { color: #7dff9b; border-bottom: 1px solid #7dff9b; }

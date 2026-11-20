@@ -7,6 +7,8 @@ Published with GitHub Pages.
 
 ```
 index.html                  Home page: list of write-ups
+about/index.html            About page (whoami)
+assets/nav.css              Shared navigation bar
 <slug>/index.html           Each write-up's interactive page
 drafts/<slug>/article.md    dev.to version of the write-up
 drafts/<slug>/linkedin-post.md  LinkedIn post text and video plan
