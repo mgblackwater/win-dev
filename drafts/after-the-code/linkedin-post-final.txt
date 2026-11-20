@@ -1,6 +1,6 @@
 𝗦𝗵𝗶𝗽 𝗕𝗲𝘁𝘁𝗲𝗿, 𝗡𝗼𝘁 𝗠𝗼𝗿𝗲
 
-A few months ago I wrote that the role was never the code. The role is to deliver working software.
+A few months ago I wrote that a software engineer's job was never the code. It was always to deliver working software.
 
 Gen AI now writes a large share of the implementation. That frees up hours. The question is what we do with them.
 
